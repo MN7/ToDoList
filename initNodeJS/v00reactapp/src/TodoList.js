@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Typography, Container, TextField } from '@material-ui/core';
+import { Box, Button, Container, Grid, TextField, Typography } from '@material-ui/core';
 import TodoItems from "./TodoItems";
 
 class TodoList extends Component {
@@ -10,9 +10,14 @@ class TodoList extends Component {
     };
   this.addItem = this.addItem.bind(this);
   this.editItem = this.editItem.bind(this);
+
+  this.debug = false;
   }
 
+
+
   addItem(e) {
+    if (this.debug) console.log("reached add item");
     if (this._inputElement.value !== "") {
       var newItem = {
         text: this._inputElement.value,
@@ -28,7 +33,7 @@ class TodoList extends Component {
       this._inputElement.value = "";
     }
 
-    console.log(this.state.items);
+    if (this.debug) console.log(this.state.items);
 
     e.preventDefault();
   }
@@ -61,11 +66,30 @@ class TodoList extends Component {
 
       <Container className="todoListMain" maxWidth="sm">
         <Typography variant="h4" gutterBottom>Simple To Do List App</Typography>
-        <Typography variant="h7" gutterBottom> ... using ReactJS & Materials UI</Typography>
+        <Typography variant="caption" display="block" gutterBottom>  ... using ReactJS & Materials UI </Typography>
         <form onSubmit={this.addItem}>
-        
+          <Box my={3}>
+            <Grid container>
+              <Grid item xs>
+                <TextField id="TxfAddItem" label="Enter To Do Item" variant="outlined" size="small"
+                inputRef={(a) => this._inputElement = a} />
+              </Grid>
+              <Grid item xs>
+                <Button type="submit" variant="contained" color="primary"> Add </Button>
+              </Grid>
+            </Grid>
+          </Box>
         </form>
+        <Box my={3}>
+        <TodoItems entries={this.state.items}
+                   edit={this.editItem}/>
+        </Box>
+        <Box my={3}>
+          <Typography variant="caption" display="block" gutterBottom> Current React Version: {REACT_VERSION} </Typography>
+        </Box>
       </Container>
+
+
 
       // <div className="todoListMain">
       //   <div className="header">

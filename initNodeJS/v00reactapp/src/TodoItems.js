@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+// import { TextField, Typography } from '@material-ui/core';
 
 class TodoItems extends Component {
 
@@ -20,6 +21,7 @@ class TodoItems extends Component {
   render() {
     var todoEntries = this.props.entries;
     var listItems = todoEntries.map(this.createTasks);
+    if (this.debug) console.log(listItems);
 
     return (
       <ul className="theList">
