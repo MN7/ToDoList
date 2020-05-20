@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Button } from '@material-ui/core';
+import { Button, Typography, Container, TextField } from '@material-ui/core';
 import TodoItems from "./TodoItems";
-import "./TodoList.css";
 
 class TodoList extends Component {
   constructor(props) {
@@ -59,23 +58,32 @@ class TodoList extends Component {
   render() {
     const REACT_VERSION = React.version;
     return (
-      <div className="todoListMain">
-        <div className="header">
-          <h1> Simple To Do List App</h1>
-          <h5> .. using ReactJS + Materials UI icons</h5>
-          <form onSubmit={this.addItem}>
-            <input ref={(a) => this._inputElement = a}
-              placeholder="Enter To Do Item">
-            </input>
-            <Button type="submit">add</Button>
-          </form>
-        </div>
-        <TodoItems entries={this.state.items}
-                   edit={this.editItem}/>
-        <div className="footer">
-          <h5>Current React Version: {REACT_VERSION} </h5>
-        </div>
-      </div>
+
+      <Container className="todoListMain" maxWidth="sm">
+        <Typography variant="h4" gutterBottom>Simple To Do List App</Typography>
+        <Typography variant="h7" gutterBottom> ... using ReactJS & Materials UI</Typography>
+        <form onSubmit={this.addItem}>
+        
+        </form>
+      </Container>
+
+      // <div className="todoListMain">
+      //   <div className="header">
+      //     <h1> Simple To Do List App</h1>
+      //     <h5> .. using ReactJS + Materials UI icons</h5>
+      //     <form onSubmit={this.addItem}>
+      //       <input ref={(a) => this._inputElement = a}
+      //         placeholder="Enter To Do Item">
+      //       </input>
+      //       <Button type="submit">add</Button>
+      //     </form>
+      //   </div>
+      //   <TodoItems entries={this.state.items}
+      //              edit={this.editItem}/>
+      //   <div className="footer">
+      //     <h5>Current React Version: {REACT_VERSION} </h5>
+      //   </div>
+      // </div>
     );
   }
 }
