@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Button } from '@material-ui/core';
 import TodoItems from "./TodoItems";
 
+// File NOT USED 
+
 class TodoList extends Component {
   constructor(props) {
   super(props);

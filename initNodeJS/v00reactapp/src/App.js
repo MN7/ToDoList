@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Form from "./Form.js"
-// import TDTable from "./TDTable.js"
 
 class App extends Component {
   state = {
@@ -31,11 +30,33 @@ class App extends Component {
     }));
   };
 
+  onClickAdd = e => {
+    this.setState({ data: [...this.state.data, e]})
+  };
+
+  onClickDelete = e => {
+    this.setState({
+      data: this.state.data.filter( (item) => item.tditem !== e )
+    });
+  };
+
+  getTDItems(){
+
+    let result = [];
+    for (var i = 0; i < this.state.data.length; i++) {
+      result+=this.state.data[i].tditem;
+    }
+
+    return result;
+  }
+
   render() {
     return (
       <div>
-        <Form onClickAdd={submission => this.setState({ data: [...this.state.data, submission] })}
+        <Form onClickAdd={e => this.onClickAdd(e)}
               getUpdtState={outar => outar=this.state.data}
+              getTDItems={outar => outar=this.getTDItems()}
+              onClickDelete={e => this.onClickDelete(e)}
         />
         <p> {JSON.stringify(this.state.data, null, 2)} </p>
       </div>

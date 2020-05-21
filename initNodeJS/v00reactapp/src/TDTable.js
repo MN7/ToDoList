@@ -7,6 +7,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { IconButton } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit'
 
 const useStyles = makeStyles({
   table: {
@@ -14,7 +17,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function SimpleTable(inpdata = []) {
+export default function SimpleTable(props) {
   const classes = useStyles();
 
   return (
@@ -28,13 +31,21 @@ export default function SimpleTable(inpdata = []) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {inpdata.rows.map((row) => (
+          {props.rows.map((row) => (
             <TableRow key={row.tditem}>
               <TableCell component="th" scope="row">
                 {row.tditem}
               </TableCell>
-              <TableCell align="right">{row.tdedit}</TableCell>
-              <TableCell align="right">{row.tddel}</TableCell>
+              <TableCell align="right">
+                <IconButton aria-label="edit" >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </TableCell>
+              <TableCell align="right">
+                <IconButton aria-label="delete" onClick={ () => props.onClickDelete(row.tditem)} >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

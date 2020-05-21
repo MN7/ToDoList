@@ -30,7 +30,7 @@ class Form extends Component {
       errors.tditemerror = "To-Do Item must not be blank";
     }
 
-    if (1 === 0) { // check if item already exists in table.. implement-later.
+    if (this.props.getTDItems().toString().indexOf(this.state.tditem.toString()) >= 0) { // check if item already exists in table.. implement-later.
       isError = true;
       errors.tditemerror = "To-Do Item already exists";
     }
@@ -56,15 +56,9 @@ class Form extends Component {
     }
   };
 
-  createRow(tditem, tdedit, tddel) {
-    return { tditem, tdedit, tddel };
+  onClickDelete = e => {
+    this.props.onClickDelete(e);
   }
-
-  getAppRows(){
-    return this.props.getUpdtState();
-    // return [this.createRow("abcd",0,0), this.createRow("ggs",0,0), this.createRow("qwert",0,0)];
-  }
-
 
   render() {
     const REACT_VERSION = React.version;
@@ -91,7 +85,8 @@ class Form extends Component {
           </Grid>
         </Box>
         <Box name="statictable" my={3}>
-          <TDTable rows={this.getAppRows()} />
+          <TDTable rows={this.props.getUpdtState()} onClickDelete={this.onClickDelete}
+          />
         </Box>
         <Box name="footer" my={3}>
           <Typography variant="caption" display="block" align="justify" gutterBottom>
