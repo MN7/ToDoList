@@ -65,8 +65,8 @@ class TodoList extends Component {
     return (
 
       <Container className="todoListMain" maxWidth="sm">
-        <Typography variant="h4" gutterBottom>Simple To Do List App</Typography>
-        <Typography variant="caption" display="block" gutterBottom>  ... using ReactJS & Materials UI </Typography>
+        <Typography variant="h4" gutterBottom>Simple <u>To Do List</u> App</Typography>
+        <Typography variant="caption" display="block" align="center" gutterBottom>  ...... powered by ReactJS & Materials UI </Typography>
         <form onSubmit={this.addItem}>
           <Box my={3}>
             <Grid container>
@@ -81,33 +81,13 @@ class TodoList extends Component {
           </Box>
         </form>
         <Box my={3}>
-        <TodoItems entries={this.state.items}
-                   edit={this.editItem}/>
+          <TodoItems entries={this.state.items} edit={this.editItem}/>
         </Box>
         <Box my={3}>
           <Typography variant="caption" display="block" gutterBottom> Current React Version: {REACT_VERSION} </Typography>
         </Box>
       </Container>
 
-
-
-      // <div className="todoListMain">
-      //   <div className="header">
-      //     <h1> Simple To Do List App</h1>
-      //     <h5> .. using ReactJS + Materials UI icons</h5>
-      //     <form onSubmit={this.addItem}>
-      //       <input ref={(a) => this._inputElement = a}
-      //         placeholder="Enter To Do Item">
-      //       </input>
-      //       <Button type="submit">add</Button>
-      //     </form>
-      //   </div>
-      //   <TodoItems entries={this.state.items}
-      //              edit={this.editItem}/>
-      //   <div className="footer">
-      //     <h5>Current React Version: {REACT_VERSION} </h5>
-      //   </div>
-      // </div>
     );
   }
 }
