@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Button } from '@material-ui/core';
 import TodoItems from "./TodoItems";
-import "./TodoList.css";
 
 class TodoList extends Component {
   constructor(props) {
