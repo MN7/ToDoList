@@ -34,11 +34,11 @@ class Form extends Component {
   change = e => {
     // this.props.onChange({ [e.target.name]: e.target.value });
     this.setState({
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
-  resetSrch = () => {this.setState({tdsrchflag: false})}
+  resetSrch = () => {this.setState({tdsrchflag: false, tditemerror: ""})}
 
   searchTDItems = (val) => {
     let tmpar = this.props.getUpdtState();
@@ -72,7 +72,6 @@ class Form extends Component {
   };
 
   onClickAdd = e => {
-    this.resetSrch();
     e.preventDefault();
     const err = this.validate();
     if (!err) {
@@ -90,7 +89,7 @@ class Form extends Component {
   onClickSearch = e => {
     // search for entered to-do-item
     let msg="";
-    if (this.state.tditem.length<0){ msg="To-Do Item must not be blank"; }
+    if (this.state.tditem.length<=0){ msg="To-Do Item must not be blank"; }
     else {
       const srchIdx=this.searchTDItems(this.state.tditem.toString());
       if (srchIdx === -1) {
@@ -103,7 +102,6 @@ class Form extends Component {
   };
 
   onClickEdit = e => {
-    this.resetSrch();
     if (e.length<1){
       this.setState({ tditemerror: "To-Do Item must not be blank"});
       return;
@@ -145,7 +143,6 @@ class Form extends Component {
   };
 
   onClickDelete = e => {
-    this.resetSrch();
     this.props.onClickDelete(e);
   };
 
@@ -168,16 +165,19 @@ class Form extends Component {
             <Grid item xs={5}>
               <TextField name="tditem" label="Enter To Do Item" variant="outlined" size="small" style={{ width: "90%"}}
               value={this.state.tdeditflag ? "" : this.state.tditem} onChange={e => this.change(e)}
-              error={!(this.state.tdeditflag || this.state.tdsrchflag) && this.state.tditemerror !== ""}
+              error={!(this.state.tdeditflag || (this.state.tdsrchflag && this.state.tditem.length!==0)) && this.state.tditemerror !== ""}
               disabled={this.state.tdeditflag}
-              helperText={(this.state.tdeditflag || this.state.tdsrchflag) ? "" : this.state.tditemerror}
+              helperText={(this.state.tdeditflag || (this.state.tdsrchflag && this.state.tditem.length!==0)) ? "" : this.state.tditemerror}
                />
             </Grid>
             <Grid item xs={2}>
               <Button variant="contained" color="primary" onClick={e => this.onClickAdd(e)} endIcon={<Icon>add_circle</Icon>}> Add </Button>
             </Grid>
             <Grid item xs={1}>
-              <Button variant="contained" color="primary" onClick={e => this.onClickSearch(e)} endIcon={<Icon>search</Icon>}> Search </Button>
+              <Button variant="contained" color="primary" onClick={e => this.onClickSearch(e)} onBlur={e=>this.resetSrch()}
+                      endIcon={<Icon>search</Icon>}>
+                      Search
+              </Button>
             </Grid>
           </Grid>
         </Box>
