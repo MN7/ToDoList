@@ -1,3 +1,6 @@
+// Drop further progress due to problem with initial load of JSON data into data-array.
+// Also, it is very difficult to pass result from the JSON Ops file back into the parent
+
 import React, { Component } from "react";
 import { Box, Button, Grid, IconButton, TextField, Typography } from "@material-ui/core"
 import Table from '@material-ui/core/Table';
@@ -12,6 +15,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CheckIcon from '@material-ui/icons/Check';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Icon from '@material-ui/core/Icon';
+import Fileops from "./Fileops.js"
 
 
 // import { makeStyles } from '@material-ui/core/styles';
@@ -35,6 +39,8 @@ class Form extends Component {
         apusername: "",
         appassword: "",
         myforms: "main",
+        fops: {"action": "", "input": []},
+        fresult: ""
       };
   }
 
@@ -44,6 +50,10 @@ class Form extends Component {
       [e.target.name]: e.target.value
     });
   };
+
+  updtfops = (e) => {
+    if (e.length>0) { this.setState({result: e}); }
+  }
 
   resetSrch = () => {this.setState({tdsrchflag: false, tditemerror: ""})}
 
@@ -162,7 +172,7 @@ class Form extends Component {
 
   onClickLogInOkay = e => {
     let newflg=true;
-    this.props.userLogOn(this.state.apusername, this.state.appassword);
+
     this.setState({"aploginflag": newflg, "myforms": "main"});
   }
 
@@ -183,7 +193,6 @@ class Form extends Component {
   }
 
   onClickAcctLogOff = e => {
-    this.props.userLogOff();
     this.setState({"myforms": "main", "aploginflag": false});
   }
 
@@ -217,6 +226,7 @@ class Form extends Component {
         <Typography variant="caption" display="block" align="justify" gutterBottom>
           Current React Version: {REACT_VERSION}
         </Typography>
+        {this.state.fops.action.length>0 ? <Fileops fopsarg={this.state.fops} /> : ""}
       </Box>
     ;
 
