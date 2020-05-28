@@ -34,7 +34,7 @@ class Form extends Component {
         aploginerror: "", // handle new-user creation error + login credential errors.
         apusername: "",
         appassword: "",
-        myforms: "main",
+        myforms: "main"
       };
   }
 

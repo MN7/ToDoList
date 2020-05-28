@@ -15,7 +15,7 @@ class App extends Component {
   userLogOff() { this.clearStateArr(); }
 
   _getData = (u,p) => {
-      fetch("./v00jsondata.json")
+      fetch("./api/todoitems")
       .then(res => {
         if (!res.ok) {
           throw(new Error("Fetch failed to obtain JSON info with status: "+res.status));
@@ -23,9 +23,8 @@ class App extends Component {
       })
       .then(res => res.json())
       .then(json => {
-        let tgtidx=json.lines.map(line => line.username === u ? line.username : "").findIndex(i => i.length>0);
-        let tgtline = json.lines[tgtidx];
-        this.setState({data: tgtline.todolist, userdix:tgtidx});
+        console.log("json: "+JSON.stringify(json));
+        this.setState({data: json});
         })
       ;
   }
