@@ -32,6 +32,22 @@ router.post('/', (req, res) => {
 });
 
 /**
+ * @route   UPDATE api/items/:id
+ * desc    Update todoitem
+ * access  Public
+ */
+
+router
+  .post('/:id', (req, res) => {
+    const updToDoItem = {"tditem": req.body.tditem};
+    const updId = {"_id": req.params.id};
+    ToDoItem.findByIdAndUpdate(updId, updToDoItem)
+      .then( () => res.json({success: true}))
+      .catch(err => res.status(400).json({success:false, message: err}))
+      ;
+  });
+
+/**
  * @route   DELETE api/items/:id
  * desc    Delete todoitem
  * access  Public

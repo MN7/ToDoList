@@ -12,6 +12,7 @@ app.use(bodyParser.json());
 const db = require('./config/keys').mongoURI;
 
 // Connect to Mongo
+mongoose.set('useFindAndModify', false);
 mongoose
   .connect(db, {
     useNewUrlParser: true,

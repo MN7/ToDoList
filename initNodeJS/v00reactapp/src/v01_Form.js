@@ -26,172 +26,33 @@ class Form extends Component {
     super(props);
     // myforms = "main", "account", "login"
     this.state = {
-      data: [],
-      editIdx: -1,
-      useridx: -1,
-      tditem: "",
-      tditemerror: "", // handles to-do item errors (edit, add, search)
-      tdeditflag: false,
-      tdsrchflag: false,
-      aploginflag: false,
-      aploginerror: "", // handle new-user creation error + login credential errors.
-      apusername: "",
-      appassword: "",
-      myforms: "main"
+        tditem: "",
+        tditemerror: "", // handles to-do item errors (edit, add, search)
+        tdeditflag: false,
+        tdsrchflag: false,
+        aploginflag: false,
+        aploginerror: "", // handle new-user creation error + login credential errors.
+        apusername: "",
+        appassword: "",
+        myforms: "main"
       };
   }
 
-  userLogOn(usr,pwd) { this.getUserInfo(usr,pwd); }
-  userLogOff() { this.clearStateArr(); }
-
-  getUserInfo = (u,p) => {
-      fetch("./api/todoitems")
-      .then(res => {
-        if (!res.ok) {
-          throw(new Error("Fetch failed to obtain JSON info with status: "+res.status));
-        } else return res;
-      })
-      .then(res => res.json())
-      .then(json => {
-console.log("gui mid json: "+JSON.stringify(json));
-let arr=json.map((x) => {return {"tditem":x.tditem, "_id":x._id}});
-console.log("gui mid arr: "+JSON.stringify(arr));
-        this.setState({data: arr});
-        })
-      ;
-  }
-
-  componentDidMount(){this.getUserInfo(0,0);}
-
-  handleAPIReq = (apiflag, val, idx=-1) => {
-
-console.log("har bgn val: "+val+" idx: "+idx);
-    const reqOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({"tditem":val})
-    };
-    const id=(!(apiflag==="add") && this.state.data[idx]._id);
-    let tmpar=(!(apiflag==="add") && [...this.state.data]);
-console.log("har mid reqOptions: "+JSON.stringify(reqOptions));
-
-    switch(apiflag){
-      default:
-        return;
-      case "add":
-        fetch("./api/todoitems", reqOptions)
-          .then(res => {
-            if (!res.ok) throw (new Error("POST to db failed with status: "+res.status));
-            else return res;
-          })
-          .then(res => res.json())
-          .then(json => {
-console.log("har mid ADD ret-json: "+JSON.stringify(json)+" id: "+json._id);
-            this.setState({data: [...this.state.data,{"tditem":json.tditem, "_id":json._id}]})
-          })
-        break;
-
-      case "edit":
-        const updarelt={"tditem":val,"_id":id};
-        tmpar[idx]=updarelt;
-console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
-        fetch("./api/todoitems/"+id, reqOptions)
-          .then(res => {
-            if(!res.ok) throw (new Error("POST UPDATE to db failed with status: "+res.status));
-            else return res;
-          })
-          .then(res => res.json())
-          .then(json => {
-console.log("har mid EDIT ret-json: "+JSON.stringify(json)+" success: "+json.success);
-            this.setState({data: tmpar})
-          })
-        break;
-
-      case "delete":
-        tmpar.splice(idx,1);
-console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
-        fetch("./api/todoitems/"+id, {method: "DELETE"})
-          .then(res => {
-            if(!res.ok) throw (new Error("DELETE from db failed with status: "+res.status));
-            else return res;
-          })
-          .then(res => res.json())
-          .then(json => {
-console.log("har mid DELETE ret-json: "+JSON.stringify(json)+" success: "+json.success);
-            this.setState({data: tmpar})
-          })
-
-        break;
-    }
-
-
-  }
-
-  updtStateArr = (updtflag="add", oldval, newval="") => { // updtflag can be "add", "edit" or "delete"
-    let tmpar = [...this.state.data];
-    let idx = tmpar.findIndex(function(obj){return obj.tditem.toString()===oldval});
-console.log("usa bgn: updtflag: "+updtflag+" oldval: "+oldval+" newval: "+newval);
-    switch(updtflag){
-      default:
-      case "add":
-        this.handleAPIReq(updtflag, oldval);
-        break;
-      case "edit":
-        this.handleAPIReq(updtflag, newval, idx);
-        break;
-      case "delete":
-        this.handleAPIReq(updtflag, oldval, idx);
-
-        // tmpar.splice(idx, 1);
-        // this.setState({data: tmpar});
-        break;
-    }
-console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: "+JSON.stringify(tmpar));
-  };
-
-  clearStateArr = () => { this.setState({data:[]})}
-
-  getTDItems(inpar = []){
-
-    let result = [];
-    let tgtar = (inpar.length > 0) ? inpar : this.state.data;
-    for (var i = 0; i < tgtar.length; i++) {
-      result+=tgtar[i].tditem;
-    }
-
-    return result;
-  }
-
-  searchTDItems = (val) => {
-    let tmpar = this.state.data;
-    let idx = tmpar.findIndex(function(obj){return obj.tditem.toString()===val});
-    // console.log("val: "+val+": tmpar: "+JSON.stringify(tmpar, null, 3));
-    return idx;
-  };
-
-  canEditNow = () => {
-    return this.state.editIdx === -1;
-  };
-
-  getEditIdx = () => { return this.state.editIdx; }
-
-  // myToString(inpar = []){
-  //   let result="";
-  //   if (inpar.length < 1) return "Empty Array";
-  //   return JSON.stringify(inpar, null, 2);
-  // }
-
-  onClickEditDataArr = e => {
-
-  };
-
   change = e => {
+    // this.props.onChange({ [e.target.name]: e.target.value });
     this.setState({
       [e.target.name]: e.target.value
     });
   };
 
   resetSrch = () => {this.setState({tdsrchflag: false, tditemerror: ""})}
+
+  searchTDItems = (val) => {
+    let tmpar = this.props.getUpdtState();
+    let idx = tmpar.findIndex(function(obj){return obj.tditem.toString()===val});
+    // console.log("val: "+val+": tmpar: "+JSON.stringify(tmpar, null, 3));
+    return idx;
+  };
 
   validate = () => {
     let isError = false;
@@ -221,7 +82,9 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
     e.preventDefault();
     const err = this.validate();
     if (!err) {
-      this.updtStateArr("add", this.state.tditem);
+      this.props.onClickAdd(this.state);
+      // clear form
+
       this.setState({
         tditem: "",
         tditemerror: "",
@@ -253,11 +116,10 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
     if (this.searchTDItems(e)>-1) {
       this.setState({ tditemerror: "To-Do Item already exists"});
     } else {
-      this.updtStateArr("edit", this.state.editIdx.toString(), e);
+      this.props.onClickEdit(e);
       this.setState({
         tditem: "",
         tditemerror: "",
-        editIdx: -1,
         tdeditflag: false
       });
     }
@@ -268,27 +130,27 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
   };
 
   startEditing = e => {
-    this.setState({
+    this.props.startEditing(e);
+    this.setState( e => ({
       tditem: e,
       tditemerror: "",
-      editIdx: e,
       tdeditflag: true,
       tdsrchflag: false
-    });
+    }));
   }
 
   cancelEdit = e => {
     this.setState({
       tditem: "",
       tditemerror: "",
-      editIdx: -1,
       tdeditflag: false,
       tdsrchflag: false
     });
+    this.props.stopEditing();
   };
 
   onClickDelete = e => {
-    this.updtStateArr("delete", e);
+    this.props.onClickDelete(e);
   };
 
   onClickLogInPopForm = e => {
@@ -300,7 +162,7 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
 
   onClickLogInOkay = e => {
     let newflg=true;
-    this.userLogOn(this.state.apusername, this.state.appassword);
+    this.props.userLogOn(this.state.apusername, this.state.appassword);
     this.setState({"aploginflag": newflg, "myforms": "main"});
   }
 
@@ -321,7 +183,7 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
   }
 
   onClickAcctLogOff = e => {
-    this.userLogOff();
+    this.props.userLogOff();
     this.setState({"myforms": "main", "aploginflag": false});
   }
 
@@ -355,7 +217,6 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
         <Typography variant="caption" display="block" align="justify" gutterBottom>
           Current React Version: {REACT_VERSION}
         </Typography>
-        <p>State Array: {JSON.stringify(this.state, null, 3)}</p>
       </Box>
     ;
 
@@ -457,18 +318,18 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {this.state.data.map((row) => (
+                  {this.props.getUpdtState().map((row) => (
                     <TableRow key={row.tditem}>
                       <TableCell>
-                        <TextField label={row.tditem} variant={(row.tditem===this.getEditIdx() && this.state.tdeditflag)?"outlined":"standard"}
-                                   disabled={!(row.tditem===this.getEditIdx() && this.state.tdeditflag)} onChange={e => {tempitem.tditem = e.target.value}}
-                                   error={((row.tditem===this.getEditIdx() && this.state.tdeditflag) && this.state.tditemerror.length>0)}
-                                   helperText={(row.tditem===this.getEditIdx() && this.state.tdeditflag) ? this.state.tditemerror:""}
-                                   color={(row.tditem===this.getEditIdx() && this.state.tdeditflag)?"secondary":"primary"}
+                        <TextField label={row.tditem} variant={(row.tditem===this.props.getEditIdx() && this.state.tdeditflag)?"outlined":"standard"}
+                                   disabled={!(row.tditem===this.props.getEditIdx() && this.state.tdeditflag)} onChange={e => {tempitem.tditem = e.target.value}}
+                                   error={((row.tditem===this.props.getEditIdx() && this.state.tdeditflag) && this.state.tditemerror.length>0)}
+                                   helperText={(row.tditem===this.props.getEditIdx() && this.state.tdeditflag) ? this.state.tditemerror:""}
+                                   color={(row.tditem===this.props.getEditIdx() && this.state.tdeditflag)?"secondary":"primary"}
                         />
                       </TableCell>
                       <TableCell align="right">
-                        {!(row.tditem===this.getEditIdx() && this.state.tdeditflag) ?
+                        {!(row.tditem===this.props.getEditIdx() && this.state.tdeditflag) ?
                           <IconButton aria-label="edit" onClick={ () => this.startEditing(row.tditem)}> <EditIcon fontSize="small" /> </IconButton>
                         :
                           <Box>
@@ -509,10 +370,5 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
 
   }
 }
-
-// onClickAdd={e => this.onClickAdd(e)} onClickEdit={e => this.onClickEdit(e)} getUpdtState={outar => outar=this.state.data}
-// getTDItems={outar => outar=this.getTDItems()} onClickDelete={e => this.onClickDelete(e)} startEditing={e => this.startEditing(e)}
-// stopEditing={e => this.stopEditing()} canEditNow={e => this.canEditNow()} getEditIdx={e => this.getEditIdx()} forceUpdate={e => this.forceUpdate()}
-// userLogOn={ (u,p) => this.userLogOn(u,p)} userLogOff={ e => this.userLogOff()}
 
 export default Form;

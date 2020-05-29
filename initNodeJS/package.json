@@ -7,7 +7,7 @@
     "client-install": "npm install --prefix v00reactapp",
     "start": "node server.js",
     "server": "nodemon server.js",
-    "client": "npm start --prefix v00v00reactapp",
+    "client": "npm start --prefix v00reactapp",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Narayan",
