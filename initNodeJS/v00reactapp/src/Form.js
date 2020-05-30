@@ -13,7 +13,6 @@ import CheckIcon from '@material-ui/icons/Check';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Icon from '@material-ui/core/Icon';
 
-
 // import { makeStyles } from '@material-ui/core/styles';
 // const useStyles = makeStyles({
 //   table: {
@@ -34,17 +33,59 @@ class Form extends Component {
       tdeditflag: false,
       tdsrchflag: false,
       aploginflag: false,
-      aploginerror: "", // handle new-user creation error + login credential errors.
       apusername: "",
+      aploginerroru: "",
       appassword: "",
-      myforms: "main"
+      aploginerrorp: "",
+      apemail:"",
+      aploginerrore: "",
+      myforms: "main" // main, login, account-add, account-view
       };
   }
 
-  userLogOn(usr,pwd) { this.getUserInfo(usr,pwd); }
+  userLogOn(user,email,pwd) {
+    fetch("./api/users/login", {
+      method: "POST", headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({"username":user, "email":email, "password":pwd})
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.success) {
+        this.getInitUserTDItems(json._id);
+        alert("User "+json.username+" logged in !");
+        this.setState({aploginflag: true, myforms: "main", apusername: json.username});
+        console.log("User login successful. Result: "+JSON.stringify(json));
+      } else {
+        alert("User "+this.state.apusername+" log-in failed. Failure reason: "+json.message);
+        this.setState({"aploginflag": false, "myforms": "login", aploginerroru:"Login Failed."});
+        console.log("User login failed with message: "+json.message);
+      }
+    })
+    ;
+  }
   userLogOff() { this.clearStateArr(); }
 
-  getUserInfo = (u,p) => {
+  userCreate(user,email,pwd){
+    fetch("./api/users/register", {
+      method: "POST", headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({"username":user, "email":email, "password":pwd})
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.success) {
+        alert("User "+this.state.apusername+" has been created successfully !");
+        this.setState({aploginflag: true, myforms: "main"});
+        console.log("User registered. Result: "+JSON.stringify(json));
+      } else {
+        alert("User "+this.state.apusername+" NOT created. Failure reason: "+json.message);
+        this.setState({"aploginflag": false, "myforms": "account-add", aploginerroru:"Unable to create user. Try again."});
+        console.log("User registration failed with message: "+json.message);
+      }
+    })
+    ;
+  }
+
+  getInitUserTDItems = (user) => {
       fetch("./api/todoitems")
       .then(res => {
         if (!res.ok) {
@@ -53,19 +94,19 @@ class Form extends Component {
       })
       .then(res => res.json())
       .then(json => {
-console.log("gui mid json: "+JSON.stringify(json));
-let arr=json.map((x) => {return {"tditem":x.tditem, "_id":x._id}});
-console.log("gui mid arr: "+JSON.stringify(arr));
+// console.log("gui mid json: "+JSON.stringify(json));
+        let arr=json.map((x) => {return {"tditem":x.tditem, "_id":x._id}});
+// console.log("gui mid arr: "+JSON.stringify(arr));
         this.setState({data: arr});
         })
       ;
   }
 
-  componentDidMount(){this.getUserInfo(0,0);}
+  // componentDidMount(){this.getInitUserTDItems(user);}
 
   handleAPIReq = (apiflag, val, idx=-1) => {
 
-console.log("har bgn val: "+val+" idx: "+idx);
+// console.log("har bgn val: "+val+" idx: "+idx);
     const reqOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -73,7 +114,7 @@ console.log("har bgn val: "+val+" idx: "+idx);
     };
     const id=(!(apiflag==="add") && this.state.data[idx]._id);
     let tmpar=(!(apiflag==="add") && [...this.state.data]);
-console.log("har mid reqOptions: "+JSON.stringify(reqOptions));
+// console.log("har mid reqOptions: "+JSON.stringify(reqOptions));
 
     switch(apiflag){
       default:
@@ -86,7 +127,7 @@ console.log("har mid reqOptions: "+JSON.stringify(reqOptions));
           })
           .then(res => res.json())
           .then(json => {
-console.log("har mid ADD ret-json: "+JSON.stringify(json)+" id: "+json._id);
+// console.log("har mid ADD ret-json: "+JSON.stringify(json)+" id: "+json._id);
             this.setState({data: [...this.state.data,{"tditem":json.tditem, "_id":json._id}]})
           })
         break;
@@ -94,7 +135,7 @@ console.log("har mid ADD ret-json: "+JSON.stringify(json)+" id: "+json._id);
       case "edit":
         const updarelt={"tditem":val,"_id":id};
         tmpar[idx]=updarelt;
-console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
+// console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
         fetch("./api/todoitems/"+id, reqOptions)
           .then(res => {
             if(!res.ok) throw (new Error("POST UPDATE to db failed with status: "+res.status));
@@ -102,14 +143,14 @@ console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: 
           })
           .then(res => res.json())
           .then(json => {
-console.log("har mid EDIT ret-json: "+JSON.stringify(json)+" success: "+json.success);
+// console.log("har mid EDIT ret-json: "+JSON.stringify(json)+" success: "+json.success);
             this.setState({data: tmpar})
           })
         break;
 
       case "delete":
         tmpar.splice(idx,1);
-console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
+// console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
         fetch("./api/todoitems/"+id, {method: "DELETE"})
           .then(res => {
             if(!res.ok) throw (new Error("DELETE from db failed with status: "+res.status));
@@ -117,7 +158,7 @@ console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: 
           })
           .then(res => res.json())
           .then(json => {
-console.log("har mid DELETE ret-json: "+JSON.stringify(json)+" success: "+json.success);
+// console.log("har mid DELETE ret-json: "+JSON.stringify(json)+" success: "+json.success);
             this.setState({data: tmpar})
           })
 
@@ -130,7 +171,7 @@ console.log("har mid DELETE ret-json: "+JSON.stringify(json)+" success: "+json.s
   updtStateArr = (updtflag="add", oldval, newval="") => { // updtflag can be "add", "edit" or "delete"
     let tmpar = [...this.state.data];
     let idx = tmpar.findIndex(function(obj){return obj.tditem.toString()===oldval});
-console.log("usa bgn: updtflag: "+updtflag+" oldval: "+oldval+" newval: "+newval);
+// console.log("usa bgn: updtflag: "+updtflag+" oldval: "+oldval+" newval: "+newval);
     switch(updtflag){
       default:
       case "add":
@@ -146,7 +187,7 @@ console.log("usa bgn: updtflag: "+updtflag+" oldval: "+oldval+" newval: "+newval
         // this.setState({data: tmpar});
         break;
     }
-console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: "+JSON.stringify(tmpar));
+// console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: "+JSON.stringify(tmpar));
   };
 
   clearStateArr = () => { this.setState({data:[]})}
@@ -293,14 +334,14 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
 
   onClickLogInPopForm = e => {
     let currflg=this.state.aploginflag;
-    let popform=currflg?"account":"login"
+    let popform=currflg?"account-view":"login"
 
     this.setState({"myforms": popform});
   }
 
   onClickLogInOkay = e => {
     let newflg=true;
-    this.userLogOn(this.state.apusername, this.state.appassword);
+    this.userLogOn(this.state.apusername, this.state.apemail, this.state.appassword);
     this.setState({"aploginflag": newflg, "myforms": "main"});
   }
 
@@ -312,17 +353,50 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
 
   onClickLogInCreate = e => {
     let newflg=true;
-    // call app.js method to create a new user. Handle errors.
-    this.setState({"aploginflag": newflg, "myforms": "main"});
+    this.setState({"aploginflag": newflg, "myforms": "account-add"});
   }
 
-  onClickAcctOkay = e => {
+  onClickAcctCancel = e => {
     this.setState({"myforms": "main"});
   }
 
   onClickAcctLogOff = e => {
     this.userLogOff();
     this.setState({"myforms": "main", "aploginflag": false});
+  }
+
+  onClickCreateUser = e => {
+    this.setState({aploginerroru: "", aploginerrore: "", aploginerrorp: ""});
+    let msg=" must not be blank.";
+    switch(0){
+      case this.state.apusername.length:
+        this.setState({aploginerroru: "Username"+msg});
+        break;
+      case this.state.apemail.length:
+        this.setState({aploginerrore: "Email address"+msg});
+        break;
+      case this.state.appassword.length:
+        this.setState({aploginerrorp: "Password"+msg});
+        break;
+      default:
+        this.userCreate(this.state.apusername, this.state.apemail, this.state.appassword);
+    }
+  }
+
+  onClickModifyUser = e => {
+    this.setState({aploginerroru: "", aploginerrore: "", aploginerrorp: ""});
+    let msg=" must not be blank.";
+    switch(0){
+      case this.state.apusername.length:
+        this.setState({aploginerroru: "Username"+msg});
+        break;
+      case this.state.appassword.length:
+        this.setState({aploginerrorp: "Password"+msg});
+        break;
+      default:
+        alert("Modify User not yet implemented !")
+        // this.userModify(this.state.apusername, this.state.apemail, this.state.appassword);
+    }
   }
 
   render() {
@@ -359,18 +433,17 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
       </Box>
     ;
 
-
     let loginelt =
       <form>
         {header}
         <Box mt={-10}>
           <Grid container direction="column" justify="space-evenly" alignItems="flex-end">
-            <Grid item xs="auto"> <TextField name="apusername" value={this.state.apusername} onChange={e => this.change(e)}
-              error={this.state.aploginerror.length>0? true : false} helperText={this.state.aploginerror}
-              variant="standard" size="small" label="EMail ID" autoComplete="current-username" />
+            <Grid item xs="auto"> <TextField name="apemail" value={this.state.apemail} onChange={e => this.change(e)}
+              error={this.state.aploginerrore.length>0? true : false} helperText={this.state.aploginerrore}
+              variant="standard" size="small" label="EMail ID" autoComplete="current-email" />
             </Grid>
             <Grid item xs="auto"> <TextField name="appassword" value={this.state.appassword} onChange={e => this.change(e)}
-              error={this.state.aploginerror.length>0? true : false} helperText={this.state.aploginerror}
+              error={this.state.aploginerrorp.length>0? true : false} helperText={this.state.aploginerrorp}
               variant="standard" size="small" label="Password" type="password" autoComplete="current-password" />
             </Grid>
           </Grid>
@@ -401,23 +474,78 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
       </form>
     ;
 
-    let acctelt =
+    let adduserform =
       <form> {header}
-        <p> Account Info Page ... under construction</p>
-        <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
-          <Grid item xs="auto"> <Button onClick={e => this.onClickAcctOkay(e)} size="small" variant="outlined"
-                  endIcon={<Icon>done</Icon>} color="primary" >
-                  Okay
-          </Button> </Grid>
-          <Grid item xs="auto">
-          <Button onClick={e => this.onClickAcctLogOff(e)} size="small" variant="outlined"
-                  endIcon={<Icon>close</Icon>} color="primary" >
-                  Log Out
-          </Button> </Grid>
+        <Typography variant="h6" display="block" align="justify" gutterBottom>
+          Create User Form
+        </Typography>
+        <Grid container direction="column" justify="space-evenly" alignItems="flex-start">
+          <Grid item xs="auto"> <TextField name="apusername" value={this.state.apusername} onChange={e => this.change(e)}
+            error={this.state.aploginerroru.length>0? true : false} helperText={this.state.aploginerroru}
+            variant="standard" size="small" label="Username" autoComplete="current-username" />
+          </Grid>
+          <Grid item xs="auto"> <TextField name="apemail" value={this.state.apemail} onChange={e => this.change(e)}
+            error={this.state.aploginerrore.length>0? true : false} helperText={this.state.aploginerrore}
+            variant="standard" size="small" label="EMail Address" autoComplete="current-email" />
+          </Grid>
+          <Grid item xs="auto"> <TextField name="appassword" value={this.state.appassword} onChange={e => this.change(e)}
+            error={this.state.aploginerrorp.length>0? true : false} helperText={this.state.aploginerrorp}
+            variant="standard" size="small" label="Password" type="password" autoComplete="current-password" />
+          </Grid>
         </Grid>
-        {footer}
-      </form>
+        <Box mt={2}>
+          <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
+            <Grid item xs="auto"> <Button onClick={e => this.onClickCreateUser(e)} size="small" variant="outlined"
+                    endIcon={<Icon>done</Icon>} color="primary" >
+                    Create User
+            </Button> </Grid>
+            <Grid item xs="auto">
+            <Button onClick={e => this.onClickAcctLogOff(e)} size="small" variant="outlined"
+                    endIcon={<Icon>close</Icon>} color="primary" >
+                    Cancel
+            </Button> </Grid>
+          </Grid>
+        </Box>
+      {footer} </form>
+    ;
 
+    let viewuserform =
+      <form> {header}
+        <Typography variant="h6" display="block" align="justify" gutterBottom>
+          View/Edit User Form
+        </Typography>
+        <Grid container direction="column" justify="space-between" alignItems="flex-start" spacing={2}>
+          <Grid item xs="auto"> <TextField name="apusername" value={this.state.apusername} onChange={e => this.change(e)}
+            error={this.state.aploginerroru.length>0? true : false} helperText={this.state.aploginerroru}
+            variant="standard" size="small" label="Username" autoComplete="current-username" />
+          </Grid>
+          <Grid item xs="auto"> <TextField name="apemail" value={this.state.apemail}
+            disabled={true} variant="standard" size="small" label="EMail Address" />
+          </Grid>
+          <Grid item xs="auto"> <TextField name="appassword" value={this.state.appassword} onChange={e => this.change(e)}
+            error={this.state.aploginerrorp.length>0? true : false} helperText={this.state.aploginerrorp}
+            variant="standard" size="small" label="Password" type="password" autoComplete="current-password" />
+          </Grid>
+        </Grid>
+        <Box mt={2}>
+          <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
+            <Grid item xs="auto"> <Button onClick={e => this.onClickModifyUser(e)} size="small" variant="outlined"
+                    endIcon={<Icon>done</Icon>} color="primary" >
+                    Save
+            </Button> </Grid>
+            <Grid item xs="auto">
+            <Button onClick={e => this.onClickAcctCancel(e)} size="small" variant="outlined"
+                    endIcon={<Icon>close</Icon>} color="primary" >
+                    Cancel
+            </Button> </Grid>
+            <Grid item xs="auto">
+            <Button onClick={e => this.onClickAcctLogOff(e)} size="small" variant="outlined"
+                    endIcon={<Icon>exit_to_app</Icon>} color="primary" >
+                    Log Off
+            </Button> </Grid>
+          </Grid>
+        </Box>
+      {footer} </form>
     ;
 
     let mainelt =
@@ -501,7 +629,8 @@ console.log("usa end: state-data: "+JSON.stringify(this.state.data)+" \n tmpar: 
 
     switch(this.state.myforms){
       case "login": return loginelt;
-      case "account": return acctelt;
+      case "account-view": return viewuserform;
+      case "account-add": return adduserform;
       case "main":
       default:
         return mainelt;
