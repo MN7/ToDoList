@@ -39,21 +39,29 @@ class Form extends Component {
       aploginerrorp: "",
       apemail:"",
       aploginerrore: "",
+      aptoken: "",
       myforms: "main" // main, login, account-add, account-view
       };
   }
 
   userLogOn(user,email,pwd) {
+    let tmptoken="";
     fetch("./api/users/login", {
       method: "POST", headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({"username":user, "email":email, "password":pwd})
     })
-    .then(res => res.json())
+    .then(res => {
+// console.log("res-headers: "+res.headers.get('auth-token'));
+      if (res.ok) this.setState({aptoken:res.headers.get('auth-token')});
+      tmptoken=res.headers.get('auth-token');
+      return res.json();
+    })
     .then(json => {
+// console.log("json: "+JSON.stringify(json));
       if (json.success) {
-        this.getInitUserTDItems(json._id);
-        alert("User "+json.username+" logged in !");
-        this.setState({aploginflag: true, myforms: "main", apusername: json.username});
+        this.getInitUserTDItems(tmptoken);
+        // alert("User "+json.username+" logged in !");
+        this.setState({aploginflag: true, myforms: "main", apusername: json.username, aploginerroru:""});
         console.log("User login successful. Result: "+JSON.stringify(json));
       } else {
         alert("User "+this.state.apusername+" log-in failed. Failure reason: "+json.message);
@@ -85,11 +93,13 @@ class Form extends Component {
     ;
   }
 
-  getInitUserTDItems = (user) => {
-      fetch("./api/todoitems")
+  getInitUserTDItems = (token) => {
+      fetch("./api/todoitems", {
+        method: "GET", headers: { 'Content-Type': 'application/json', "auth-token": token }
+      })
       .then(res => {
         if (!res.ok) {
-          throw(new Error("Fetch failed to obtain JSON info with status: "+res.status));
+          console.log("Fetch failed to obtain JSON info with status: "+res.status+" token: "+token);
         } else return res;
       })
       .then(res => res.json())
@@ -99,6 +109,7 @@ class Form extends Component {
 // console.log("gui mid arr: "+JSON.stringify(arr));
         this.setState({data: arr});
         })
+        .catch((err) => {alert("Fetching to-do items from db failed. Error: "+err)})
       ;
   }
 
@@ -109,7 +120,7 @@ class Form extends Component {
 // console.log("har bgn val: "+val+" idx: "+idx);
     const reqOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', "auth-token":this.state.aptoken },
         body: JSON.stringify({"tditem":val})
     };
     const id=(!(apiflag==="add") && this.state.data[idx]._id);
@@ -151,7 +162,7 @@ class Form extends Component {
       case "delete":
         tmpar.splice(idx,1);
 // console.log("har mid EDIT tmpar: "+JSON.stringify(tmpar)+" id: "+id+" updarelt: "+JSON.stringify(updarelt));
-        fetch("./api/todoitems/"+id, {method: "DELETE"})
+        fetch("./api/todoitems/"+id, {method: "DELETE", headers: { 'Content-Type': 'application/json', "auth-token":this.state.aptoken }})
           .then(res => {
             if(!res.ok) throw (new Error("DELETE from db failed with status: "+res.status));
             else return res;

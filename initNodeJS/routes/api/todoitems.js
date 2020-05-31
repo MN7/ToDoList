@@ -1,6 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const ToDoItem = require ('../../models/TodoItem.js');
+const auth=require('../auth/auth.js')
 
 /**
  * @route   GET api/items
@@ -8,8 +9,8 @@ const ToDoItem = require ('../../models/TodoItem.js');
  * @access  Public
  */
 
-router.get('/', (req, res) => {
-  ToDoItem.find()
+router.get('/', auth, (req, res) => {
+  ToDoItem.find({userid: req.user})
     .sort({date:-1})
     .then(todoitems => res.json(todoitems));
 });
@@ -20,9 +21,9 @@ router.get('/', (req, res) => {
  * access  Public
  */
 
-router.post('/', (req, res) => {
+router.post('/', auth, (req, res) => {
   const newToDoItem = new ToDoItem({
-    "tditem": req.body.tditem
+    "tditem": req.body.tditem, "userid": req.user
   });
 
   newToDoItem
@@ -38,7 +39,7 @@ router.post('/', (req, res) => {
  */
 
 router
-  .post('/:id', (req, res) => {
+  .post('/:id', auth, (req, res) => {
     const updToDoItem = {"tditem": req.body.tditem};
     const updId = {"_id": req.params.id};
     ToDoItem.findByIdAndUpdate(updId, updToDoItem)
@@ -54,7 +55,7 @@ router
  */
 
 router
-  .delete('/:id', (req, res) => {
+  .delete('/:id', auth, (req, res) => {
   ToDoItem.findById(req.params.id)
     .then(todoitem => todoitem.deleteOne()
       .then(() => res.json({success: true}))

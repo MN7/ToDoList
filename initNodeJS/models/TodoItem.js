@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-
-const TdSchema = new Schema({
+const TdSchema = new mongoose.Schema({
+  userid: {
+    type: String,
+    required: true
+  },
   tditem: {
     type: String,
     required: true

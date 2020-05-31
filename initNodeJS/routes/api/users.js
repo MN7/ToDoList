@@ -1,7 +1,7 @@
 const express=require("express");
 const router=express.Router();
 const bcrypt=require("bcryptjs");
-
+const jwt = require('jsonwebtoken');
 const User = require ('../../models/User.js');
 
 /**
@@ -45,7 +45,8 @@ router.post('/login', (req, res) => {
       else {
         bcrypt.compare(req.body.password, foundOne.password)
         .then(matched => {
-          matched ? res.status(200).json({success: true, "_id":foundOne._id, "username":foundOne.username})
+          const token = jwt.sign({_id: foundOne._id}, process.env.TOKEN_SECRET);
+          matched ? res.status(200).header('auth-token', token).json({success: true, "username":foundOne.username})
                   : res.status(400).json({success: false, message: "Invalid Email or Password"})
         })
         .catch(err => res.status(400).json({success: false, message: "Hash failed "+err}))
@@ -75,7 +76,10 @@ router.post('/register', (req, res) => {
             else
               newUser
                 .save()
-                .then(savedUser => res.json({success: true, "_id":savedUser._id}))
+                .then(savedUser => {
+                  const token = jwt.sign({_id: savedUser._id}, process.env.TOKEN_SECRET);
+                  res.header('auth-token', token).json({success: true});
+                })
                 .catch(err => res.status(404).json({success: false, message: "Save failed "+err}))
                 ;
           })
