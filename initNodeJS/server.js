@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static('v00reactapp/build'));
 
   app.get('*', (req,res) => {
-    res.sendFile(path.resolve(__dirname, 'vooreactapp', 'build', 'index.html'))
+    res.sendFile(path.resolve(__dirname, 'v00reactapp', 'build', 'index.html'))
   });
 }
 
