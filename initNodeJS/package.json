@@ -7,9 +7,8 @@
     "client-install": "npm install --prefix v00reactapp",
     "start": "node server.js",
     "server": "nodemon server.js",
-    "kill-nodemon": "kill -9 $(ps aux | grep -i nodemon | awk '{print $2}')",
-    "kill-portlistener": "kill -9 $(lsof -i tcp:5000 | awk '{print $2}')",
     "client": "npm start --prefix v00reactapp",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix v00reactapp && npm run build --prefix v00reactapp",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Narayan",
