@@ -440,7 +440,7 @@ class Form extends Component {
         <Typography variant="caption" display="block" align="justify" gutterBottom>
           Current React Version: {REACT_VERSION}
         </Typography>
-        <p>State Array: {JSON.stringify(this.state, null, 3)}</p>
+        // <p>State Array: {JSON.stringify(this.state, null, 3)}</p>
       </Box>
     ;
 
