@@ -9,7 +9,7 @@
     "server": "nodemon server.js",
     "client": "npm start --prefix v00reactapp",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix v00reactapp && npm run build --prefix v00reactapp",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\""
   },
   "author": "Narayan",
   "license": "MIT",

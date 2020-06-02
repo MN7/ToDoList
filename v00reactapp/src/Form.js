@@ -71,7 +71,7 @@ class Form extends Component {
     })
     ;
   }
-  userLogOff() { this.clearStateArr(); }
+  userLogOff() { this.clearStateArr(); this.setState({aptoken: ""}); }
 
   userCreate(user,email,pwd){
     fetch("./api/users/register", {
@@ -440,7 +440,6 @@ class Form extends Component {
         <Typography variant="caption" display="block" align="justify" gutterBottom>
           Current React Version: {REACT_VERSION}
         </Typography>
-        // <p>State Array: {JSON.stringify(this.state, null, 3)}</p>
       </Box>
     ;
 
