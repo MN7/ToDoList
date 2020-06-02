@@ -11,7 +11,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{'max-width': '800px'}} >
         <Form />
       </div>
     );
